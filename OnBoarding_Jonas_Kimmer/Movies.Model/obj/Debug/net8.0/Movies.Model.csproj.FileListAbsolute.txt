@@ -1,0 +1,12 @@
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\bin\Debug\net8.0\Movies.Model.deps.json
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\bin\Debug\net8.0\Movies.Model.dll
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\bin\Debug\net8.0\Movies.Model.pdb
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.AssemblyInfoInputs.cache
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.AssemblyInfo.cs
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.csproj.CoreCompileInputs.cache
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.sourcelink.json
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.dll
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\refint\Movies.Model.dll
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\Movies.Model.pdb
+C:\Users\Jonas Kimmer\Desktop\ProjektFilme\OnBoarding_Jonas_Kimmer\Movies.Model\obj\Debug\net8.0\ref\Movies.Model.dll

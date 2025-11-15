@@ -1,0 +1,6 @@
+.openapi-generator-ignore
+apis/MoviesApi.ts
+apis/RecommendationsApi.ts
+apis/index.ts
+index.ts
+runtime.ts

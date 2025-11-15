@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Jonas Kimmer\\Desktop\\ProjektFilme\\OnBoarding_Jonas_Kimmer\\Movies\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jonas Kimmer\\Desktop\\ProjektFilme\\OnBoarding_Jonas_Kimmer\\Movies\\Movies.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Movies.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Movies.csproj",
+              "DocumentMoniker": "C:\\Users\\Jonas Kimmer\\Desktop\\ProjektFilme\\OnBoarding_Jonas_Kimmer\\Movies\\Movies.csproj",
+              "RelativeDocumentMoniker": "Movies.csproj",
+              "ToolTip": "C:\\Users\\Jonas Kimmer\\Desktop\\ProjektFilme\\OnBoarding_Jonas_Kimmer\\Movies\\Movies.csproj",
+              "RelativeToolTip": "Movies.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-03T14:41:12.141Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

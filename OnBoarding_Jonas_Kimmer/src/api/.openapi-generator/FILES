@@ -1,0 +1,11 @@
+.openapi-generator-ignore
+apis/MoviesAPIApi.ts
+apis/MoviesApi.ts
+apis/RecommendationsApi.ts
+apis/TestApi.ts
+apis/index.ts
+index.ts
+models/MovieDto.ts
+models/ProblemDetails.ts
+models/index.ts
+runtime.ts

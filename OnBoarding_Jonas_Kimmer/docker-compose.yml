@@ -1,0 +1,35 @@
+version: '3.8'
+ 
+services:
+  postgres_db:
+    image: postgres:17 # Du kannst hier eine spezifische Version angeben, 17 ist die neueste
+    container_name: postgres_movies_container
+    restart: always
+    environment:
+      POSTGRES_USER: default_user # Ändere dies
+      POSTGRES_PASSWORD: default_password # Ändere dies
+      POSTGRES_DB: postgres_movie_db # Ändere dies
+    ports:
+      - "5432:5432" # Mappt den Host-Port 5432 auf den Container-Port 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistenter Speicher für PostgreSQL-Daten
+ 
+  neo4j_db:
+    image: neo4j:5 # Du kannst hier eine spezifische Version angeben
+    container_name: neo4j_movies_container
+    restart: always
+    environment:
+      NEO4J_AUTH: neo4j/default_password # Ändere das Passwort; Format: Benutzername/Passwort
+      # NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes" # Für Neo4j Enterprise Edition erforderlich
+    ports:
+      - "7474:7474" # HTTP-Port für Neo4j Browser
+      - "7687:7687" # Bolt-Port für Treiberverbindungen
+    volumes:
+      - neo4j_data:/data # Persistenter Speicher für Neo4j-Daten
+ 
+volumes:
+  postgres_data: # Definiert das benannte Volume für PostgreSQL
+    driver: local
+  neo4j_data:    # Definiert das benannte Volume für Neo4j-Daten
+    driver: local
+ 
