@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Paper, Typography, Button, Rating, IconButton, Box, Alert,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  TextField, FormControl, InputLabel, Select, MenuItem
+  Paper, Typography, Button, Rating, IconButton, Box, Alert, Card, CardContent, CardActions,
+  TextField, FormControl, InputLabel, Select, MenuItem, Chip, Stack, Grid, Fade
 } from '@mui/material';
 import {
-  Favorite, FavoriteBorder, Delete as DeleteIcon
+  Favorite, FavoriteBorder, Delete as DeleteIcon, InfoOutlined, Star
 } from '@mui/icons-material';
-import { MoviesService } from '../services/movies';
 
 interface Movie {
   id: number;
@@ -102,7 +100,7 @@ function AllMoviesList() {
     }
   };
 
-  // Filter und Sort Logic bleibt gleich...
+  // Filter und Sort Logic
   useEffect(() => {
     let filtered = [...movies];
 
@@ -166,7 +164,7 @@ function AllMoviesList() {
       });
 
       if (response.ok) {
-        const updatedMovies = movies.map(m => 
+        const updatedMovies = movies.map(m =>
           m.id === movieId ? { ...m, isFavorite: !m.isFavorite } : m
         );
         setMovies(updatedMovies);
@@ -187,7 +185,7 @@ function AllMoviesList() {
       });
 
       if (response.ok) {
-        const updatedMovies = movies.map(m => 
+        const updatedMovies = movies.map(m =>
           m.id === movieId ? { ...m, userRating: newValue } : m
         );
         setMovies(updatedMovies);
@@ -204,7 +202,7 @@ function AllMoviesList() {
       });
 
       if (response.ok) {
-        const updatedMovies = movies.map(m => 
+        const updatedMovies = movies.map(m =>
           m.id === movieId ? { ...m, userRating: undefined } : m
         );
         setMovies(updatedMovies);
@@ -224,122 +222,141 @@ function AllMoviesList() {
 
   return (
     <Box>
-      {/* Einfache Empfehlungen Sektion */}
+      {/* Empfehlungen Sektion */}
       {recommendations.length > 0 && (
-        <Paper sx={{ p: 2, mb: 3, backgroundColor: '#f5f5f5' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">
-              💡 Beliebte Empfehlungen ({recommendations.length})
-            </Typography>
-            <Button 
-              variant="text" 
-              size="small" 
-              onClick={() => setShowRecommendations(!showRecommendations)}
-              sx={{ ml: 'auto' }}
-            >
-              {showRecommendations ? 'Ausblenden' : 'Anzeigen'}
-            </Button>
-          </Box>
-          
-          {showRecommendations && (
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 2 }}>
-              {recommendations.map((rec, index) => (
-                <Paper 
-                  key={index}
-                  sx={{ 
-                    p: 2, 
-                    cursor: 'pointer',
-                    '&:hover': { backgroundColor: '#e3f2fd' }
-                  }}
-                  onClick={() => navigate(`/movie/${rec.movie.id}`)}
-                >
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {rec.movie.title} ({rec.movie.released})
-                  </Typography>
-                  {rec.movie.rating && (
-                    <Typography variant="body2" color="primary">
-                      Rating: {rec.movie.rating}/100
-                    </Typography>
-                  )}
-                  <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.secondary' }}>
-                    {rec.reason}
-                  </Typography>
-                  {rec.movie.summary && (
-                    <Typography variant="body2" sx={{ mt: 1, fontSize: '0.85rem' }}>
-                      {rec.movie.summary.length > 120 
-                        ? rec.movie.summary.substring(0, 120) + '...'
-                        : rec.movie.summary
-                      }
-                    </Typography>
-                  )}
-                </Paper>
-              ))}
+        <Fade in={true}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              mb: 4,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              borderRadius: 3
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Star sx={{ mr: 1, fontSize: 28 }} />
+              <Typography variant="h5" fontWeight={600}>
+                Beliebte Empfehlungen
+              </Typography>
+              <Chip
+                label={recommendations.length}
+                sx={{ ml: 2, bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+              />
+              <Button
+                variant="text"
+                size="small"
+                onClick={() => setShowRecommendations(!showRecommendations)}
+                sx={{ ml: 'auto', color: 'white' }}
+              >
+                {showRecommendations ? 'Ausblenden' : 'Anzeigen'}
+              </Button>
             </Box>
-          )}
-        </Paper>
+
+            {showRecommendations && (
+              <Grid container spacing={2}>
+                {recommendations.map((rec, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          boxShadow: 6
+                        }
+                      }}
+                      onClick={() => navigate(`/movie/${rec.movie.id}`)}
+                    >
+                      <CardContent>
+                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                          {rec.movie.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {rec.movie.released}
+                        </Typography>
+                        {rec.movie.rating && (
+                          <Chip
+                            label={`${rec.movie.rating}/100`}
+                            size="small"
+                            color="primary"
+                            sx={{ mb: 1 }}
+                          />
+                        )}
+                        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'primary.main', mb: 1 }}>
+                          {rec.reason}
+                        </Typography>
+                        {rec.movie.summary && (
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                            {rec.movie.summary.length > 100
+                              ? rec.movie.summary.substring(0, 100) + '...'
+                              : rec.movie.summary
+                            }
+                          </Typography>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </Paper>
+        </Fade>
       )}
 
-      {/* Debug Info */}
-      {recommendations.length === 0 && (
-        <Paper sx={{ p: 2, mb: 2, backgroundColor: '#fff3e0' }}>
-          <Typography variant="body2">
-            Debug: Keine Empfehlungen geladen. Prüfen Sie die Console für Details.
-          </Typography>
-        </Paper>
-      )}
-
-      {/* Hauptfilmliste bleibt gleich */}
-      <Paper elevation={3} sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          Alle Filme ({filteredMovies.length} von {movies.length} Filmen)
+      {/* Filter Section */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 3 }}>
+        <Typography variant="h5" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
+          Alle Filme ({filteredMovies.length})
         </Typography>
-        
-        {/* Filter Controls */}
-        <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+
+        <Stack spacing={2} direction={{ xs: 'column', md: 'row' }} sx={{ mb: 2, flexWrap: 'wrap' }}>
           <TextField
-            label="Titel filtern"
+            label="Titel suchen"
             value={titleFilter}
             onChange={(e) => setTitleFilter(e.target.value)}
             size="small"
             sx={{ minWidth: 200 }}
           />
-          
+
           <TextField
-            label="Jahr filtern"
+            label="Jahr"
             value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
             size="small"
             sx={{ minWidth: 120 }}
           />
-          
+
           <FormControl size="small" sx={{ minWidth: 160 }}>
-            <InputLabel>Rating filtern</InputLabel>
+            <InputLabel>Rating</InputLabel>
             <Select
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value as any)}
-              label="Rating filtern"
+              label="Rating"
             >
-              <MenuItem value="all">Alle Ratings</MenuItem>
+              <MenuItem value="all">Alle</MenuItem>
               <MenuItem value="high">Hoch (80-100)</MenuItem>
               <MenuItem value="medium">Mittel (60-79)</MenuItem>
               <MenuItem value="low">Niedrig (1-59)</MenuItem>
               <MenuItem value="unrated">Ohne Rating</MenuItem>
             </Select>
           </FormControl>
-          
+
           <FormControl size="small" sx={{ minWidth: 140 }}>
-            <InputLabel>Sortieren nach</InputLabel>
+            <InputLabel>Sortieren</InputLabel>
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              label="Sortieren nach"
+              label="Sortieren"
             >
               <MenuItem value="title">Titel</MenuItem>
               <MenuItem value="released">Jahr</MenuItem>
               <MenuItem value="rating">Rating</MenuItem>
             </Select>
           </FormControl>
-          
+
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Reihenfolge</InputLabel>
             <Select
@@ -362,108 +379,127 @@ function AllMoviesList() {
               setSortOrder('asc');
             }}
           >
-            Filter zurücksetzen
+            Zurücksetzen
           </Button>
-        </Box>
+        </Stack>
+      </Paper>
 
-        {/* Table */}
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Titel</strong></TableCell>
-                <TableCell><strong>Jahr</strong></TableCell>
-                <TableCell><strong>Rating</strong></TableCell>
-                <TableCell><strong>Hauptdarsteller</strong></TableCell>
-                <TableCell><strong>Meine Bewertung</strong></TableCell>
-                <TableCell><strong>Aktionen</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    <Typography>Lade Filme...</Typography>
-                  </TableCell>
-                </TableRow>
-              ) : filteredMovies.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    <Typography color="text.secondary">
-                      {titleFilter || yearFilter || ratingFilter !== 'all' ? 'Keine Filme gefunden, die den Filterkriterien entsprechen.' : 'Keine Filme verfügbar.'}
+      {/* Movies Grid */}
+      {loading ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="h6" color="text.secondary">Lade Filme...</Typography>
+        </Box>
+      ) : filteredMovies.length === 0 ? (
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <Typography color="text.secondary">
+            {titleFilter || yearFilter || ratingFilter !== 'all'
+              ? 'Keine Filme gefunden, die den Filterkriterien entsprechen.'
+              : 'Keine Filme verfügbar.'}
+          </Typography>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredMovies.map((movie) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={movie.id}>
+              <Card
+                elevation={2}
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: 6
+                  }
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                    <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1, pr: 1 }}>
+                      {movie.title}
                     </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredMovies.map((movie) => (
-                  <TableRow key={movie.id} hover>
-                    <TableCell>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'medium' }}>
-                        {movie.title}
-                      </Typography>
-                    </TableCell>
-                    
-                    <TableCell>{movie.released}</TableCell>
-                    
-                    <TableCell>
-                      {movie.rating ? `${movie.rating}/100` : '–'}
-                    </TableCell>
-                    
-                    <TableCell>
-                      <Typography variant="body2" sx={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {movie.actors || '–'}
-                      </Typography>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Rating
-                          value={movie.userRating || 0}
-                          max={10}
-                          onChange={(_, newValue) => handleRatingChange(movie.id, newValue)}
-                          size="small"
-                        />
-                        {movie.userRating && (
-                          <IconButton 
+                    <IconButton
+                      onClick={() => handleFavoriteToggle(movie.id)}
+                      color="error"
+                      size="small"
+                    >
+                      {movie.isFavorite ? <Favorite /> : <FavoriteBorder />}
+                    </IconButton>
+                  </Box>
+
+                  <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                    <Chip label={movie.released} size="small" variant="outlined" />
+                    {movie.rating && (
+                      <Chip
+                        label={`${movie.rating}/100`}
+                        size="small"
+                        color="primary"
+                      />
+                    )}
+                  </Stack>
+
+                  {movie.tagline && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ fontStyle: 'italic', mb: 1 }}
+                    >
+                      "{movie.tagline}"
+                    </Typography>
+                  )}
+
+                  {movie.actors && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <strong>Cast:</strong> {movie.actors.substring(0, 50)}
+                      {movie.actors.length > 50 ? '...' : ''}
+                    </Typography>
+                  )}
+
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="caption" color="text.secondary" gutterBottom>
+                      Meine Bewertung:
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Rating
+                        value={movie.userRating || 0}
+                        max={10}
+                        onChange={(_, newValue) => handleRatingChange(movie.id, newValue)}
+                        size="small"
+                      />
+                      {movie.userRating && (
+                        <>
+                          <Typography variant="caption">
+                            {movie.userRating}/10
+                          </Typography>
+                          <IconButton
                             onClick={() => handleDeleteRating(movie.id)}
                             size="small"
                             color="error"
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
-                        )}
-                        <Typography variant="caption">
-                          {movie.userRating ? `${movie.userRating}/10` : '–'}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton
-                          onClick={() => handleFavoriteToggle(movie.id)}
-                          color="error"
-                          size="small"
-                        >
-                          {movie.isFavorite ? <Favorite /> : <FavoriteBorder />}
-                        </IconButton>
-                        
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => navigate(`/movie/${movie.id}`)}
-                        >
-                          Details
-                        </Button>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                </CardContent>
+
+                <CardActions sx={{ p: 2, pt: 0 }}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    startIcon={<InfoOutlined />}
+                    onClick={() => navigate(`/movie/${movie.id}`)}
+                  >
+                    Details
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 }
