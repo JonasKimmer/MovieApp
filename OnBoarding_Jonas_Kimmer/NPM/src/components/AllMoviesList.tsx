@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Typography, IconButton, Box, Card, CardContent, CardActions, Chip, TextField, Stack
+  Typography, IconButton, Box, Card, CardContent, CardActions, Chip, TextField, Stack,
+  FormControl, InputLabel, Select, MenuItem, Button, Rating
 } from '@mui/material';
 import {
-  Favorite, FavoriteBorder, PlayArrow, InfoOutlined, Star
+  Favorite, FavoriteBorder, PlayArrow, InfoOutlined, Star, Delete as DeleteIcon
 } from '@mui/icons-material';
 
 interface Movie {
@@ -38,7 +39,13 @@ function AllMoviesList() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter States
+  const [titleFilter, setTitleFilter] = useState('');
+  const [yearFilter, setYearFilter] = useState('');
+  const [ratingFilter, setRatingFilter] = useState<'all' | 'high' | 'medium' | 'low' | 'unrated'>('all');
+  const [sortBy, setSortBy] = useState<'title' | 'released' | 'rating'>('title');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -78,16 +85,58 @@ function AllMoviesList() {
     }
   };
 
+  // Filter und Sort Logic
   useEffect(() => {
-    if (searchTerm) {
-      const filtered = movies.filter(movie =>
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+    let filtered = [...movies];
+
+    if (titleFilter) {
+      filtered = filtered.filter(movie =>
+        movie.title.toLowerCase().includes(titleFilter.toLowerCase())
       );
-      setFilteredMovies(filtered);
-    } else {
-      setFilteredMovies(movies);
     }
-  }, [searchTerm, movies]);
+
+    if (yearFilter) {
+      filtered = filtered.filter(movie =>
+        movie.released.toString().includes(yearFilter)
+      );
+    }
+
+    if (ratingFilter !== 'all') {
+      filtered = filtered.filter(movie => {
+        const rating = movie.rating || 0;
+        switch (ratingFilter) {
+          case 'high':
+            return rating >= 80;
+          case 'medium':
+            return rating >= 60 && rating < 80;
+          case 'low':
+            return rating > 0 && rating < 60;
+          case 'unrated':
+            return !movie.rating || movie.rating === 0;
+          default:
+            return true;
+        }
+      });
+    }
+
+    filtered.sort((a, b) => {
+      let aValue: any = a[sortBy];
+      let bValue: any = b[sortBy];
+
+      if (sortBy === 'rating') {
+        aValue = aValue || 0;
+        bValue = bValue || 0;
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredMovies(filtered);
+  }, [movies, titleFilter, yearFilter, ratingFilter, sortBy, sortOrder]);
 
   const handleFavoriteToggle = async (movieId: number, event: React.MouseEvent) => {
     event.stopPropagation();
@@ -111,12 +160,52 @@ function AllMoviesList() {
     }
   };
 
+  const handleRatingChange = async (movieId: number, newValue: number | null, event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    if (newValue === null) return;
+
+    try {
+      const response = await fetch(`http://localhost:5157/api/movies/${movieId}/rating`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newValue)
+      });
+
+      if (response.ok) {
+        const updatedMovies = movies.map(m =>
+          m.id === movieId ? { ...m, userRating: newValue } : m
+        );
+        setMovies(updatedMovies);
+      }
+    } catch (error) {
+      console.error('Fehler beim Rating-Update:', error);
+    }
+  };
+
+  const handleDeleteRating = async (movieId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      const response = await fetch(`http://localhost:5157/api/movies/${movieId}/rating`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        const updatedMovies = movies.map(m =>
+          m.id === movieId ? { ...m, userRating: null } : m
+        );
+        setMovies(updatedMovies);
+      }
+    } catch (error) {
+      console.error('Fehler beim Rating-Löschen:', error);
+    }
+  };
+
   const MovieCard = ({ movie, isRecommendation = false }: { movie: any; isRecommendation?: boolean }) => (
     <Card
       sx={{
         minWidth: isRecommendation ? 280 : 300,
         maxWidth: isRecommendation ? 280 : 300,
-        height: isRecommendation ? 420 : 450,
+        height: isRecommendation ? 420 : 480,
         bgcolor: '#2f2f2f',
         cursor: 'pointer',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -133,7 +222,6 @@ function AllMoviesList() {
       <Box
         sx={{
           height: isRecommendation ? 180 : 200,
-          bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           background: `linear-gradient(135deg, ${['#667eea', '#f093fb', '#4facfe', '#00f2fe', '#43e97b'][movie.id % 5]} 0%, ${['#764ba2', '#f5576c', '#00f2fe', '#4facfe', '#38f9d7'][movie.id % 5]} 100%)`,
           display: 'flex',
           alignItems: 'center',
@@ -218,21 +306,34 @@ function AllMoviesList() {
           </Typography>
         )}
 
-        {movie.summary && (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              fontSize: '0.85rem',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-            }}
-          >
-            {movie.summary}
-          </Typography>
+        {!isRecommendation && (
+          <Box sx={{ mt: 2 }} onClick={(e) => e.stopPropagation()}>
+            <Typography variant="caption" color="text.secondary" gutterBottom display="block">
+              Meine Bewertung:
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Rating
+                value={movie.userRating || 0}
+                max={10}
+                size="small"
+                onChange={(e, newValue) => handleRatingChange(movie.id, newValue, e)}
+              />
+              {movie.userRating && (
+                <>
+                  <Typography variant="caption" color="text.secondary">
+                    {movie.userRating}/10
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleDeleteRating(movie.id, e)}
+                    sx={{ p: 0.5 }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          </Box>
         )}
       </CardContent>
 
@@ -322,34 +423,132 @@ function AllMoviesList() {
         </Box>
       )}
 
-      {/* Search */}
+      {/* Filter Section */}
       <Box sx={{ mb: 4, px: 1 }}>
-        <TextField
-          fullWidth
-          placeholder="Filme durchsuchen..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            maxWidth: 600,
-            '& .MuiOutlinedInput-root': {
-              bgcolor: 'rgba(255,255,255,0.1)',
+        <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>
+          Alle Filme ({filteredMovies.length})
+        </Typography>
+
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          sx={{ mb: 3, flexWrap: 'wrap' }}
+        >
+          <TextField
+            label="Titel suchen"
+            value={titleFilter}
+            onChange={(e) => setTitleFilter(e.target.value)}
+            size="small"
+            sx={{
+              minWidth: 200,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          />
+
+          <TextField
+            label="Jahr"
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+            size="small"
+            sx={{
+              minWidth: 120,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          />
+
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 160,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          >
+            <InputLabel>Rating</InputLabel>
+            <Select
+              value={ratingFilter}
+              onChange={(e) => setRatingFilter(e.target.value as any)}
+              label="Rating"
+            >
+              <MenuItem value="all">Alle</MenuItem>
+              <MenuItem value="high">Hoch (80-100)</MenuItem>
+              <MenuItem value="medium">Mittel (60-79)</MenuItem>
+              <MenuItem value="low">Niedrig (1-59)</MenuItem>
+              <MenuItem value="unrated">Ohne Rating</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 140,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          >
+            <InputLabel>Sortieren</InputLabel>
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              label="Sortieren"
+            >
+              <MenuItem value="title">Titel</MenuItem>
+              <MenuItem value="released">Jahr</MenuItem>
+              <MenuItem value="rating">Rating</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 120,
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          >
+            <InputLabel>Reihenfolge</InputLabel>
+            <Select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as any)}
+              label="Reihenfolge"
+            >
+              <MenuItem value="asc">Aufsteigend</MenuItem>
+              <MenuItem value="desc">Absteigend</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setTitleFilter('');
+              setYearFilter('');
+              setRatingFilter('all');
+              setSortBy('title');
+              setSortOrder('asc');
+            }}
+            sx={{
+              borderColor: 'rgba(255,255,255,0.3)',
+              color: 'white',
               '&:hover': {
-                bgcolor: 'rgba(255,255,255,0.15)',
-              },
-              '&.Mui-focused': {
-                bgcolor: 'rgba(255,255,255,0.15)',
-              },
-            },
-          }}
-        />
+                borderColor: 'white',
+                bgcolor: 'rgba(255,255,255,0.05)',
+              }
+            }}
+          >
+            Zurücksetzen
+          </Button>
+        </Stack>
       </Box>
 
       {/* All Movies Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" fontWeight={600} sx={{ mb: 2, px: 1 }}>
-          {searchTerm ? `Suchergebnisse (${filteredMovies.length})` : `Alle Filme (${filteredMovies.length})`}
-        </Typography>
-
         {loading ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="h6" color="text.secondary">Lade Filme...</Typography>
@@ -357,7 +556,9 @@ function AllMoviesList() {
         ) : filteredMovies.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography color="text.secondary">
-              {searchTerm ? `Keine Filme gefunden für "${searchTerm}"` : 'Keine Filme verfügbar.'}
+              {titleFilter || yearFilter || ratingFilter !== 'all'
+                ? 'Keine Filme gefunden, die den Filterkriterien entsprechen.'
+                : 'Keine Filme verfügbar.'}
             </Typography>
           </Box>
         ) : (
@@ -369,7 +570,7 @@ function AllMoviesList() {
                 sm: 'repeat(2, 1fr)',
                 md: 'repeat(3, 1fr)',
                 lg: 'repeat(4, 1fr)',
-                xl: 'repeat(5, 1fr)',
+                xl: 'repeat(6, 1fr)',
               },
               gap: 3,
               px: 1,

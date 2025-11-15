@@ -108,9 +108,9 @@ function HomePage() {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="xl" sx={{ px: { xs: 2, md: 4 }, py: 4 }}>
+      <Box sx={{ px: { xs: 2, md: 4 }, py: 4 }}>
         <AllMoviesList />
-      </Container>
+      </Box>
     </Box>
   );
 }
