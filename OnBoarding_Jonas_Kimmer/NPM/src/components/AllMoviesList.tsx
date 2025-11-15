@@ -547,7 +547,7 @@ function AllMoviesList() {
         </Stack>
       </Box>
 
-      {/* All Movies Section */}
+      {/* All Movies Section - Horizontal Scroll */}
       <Box sx={{ mb: 4 }}>
         {loading ? (
           <Box sx={{ textAlign: 'center', py: 8 }}>
@@ -564,16 +564,26 @@ function AllMoviesList() {
         ) : (
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr',
-                sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-                lg: 'repeat(4, 1fr)',
-                xl: 'repeat(6, 1fr)',
-              },
-              gap: 3,
+              display: 'flex',
+              gap: 2,
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              pb: 2,
               px: 1,
+              '&::-webkit-scrollbar': {
+                height: 8,
+              },
+              '&::-webkit-scrollbar-track': {
+                bgcolor: 'rgba(255,255,255,0.1)',
+                borderRadius: 4,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                bgcolor: 'rgba(255,255,255,0.3)',
+                borderRadius: 4,
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.5)',
+                },
+              },
             }}
           >
             {filteredMovies.map((movie) => (
