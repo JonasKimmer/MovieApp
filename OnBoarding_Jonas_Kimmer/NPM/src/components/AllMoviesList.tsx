@@ -74,24 +74,31 @@ function AllMoviesList() {
 
   const loadPopularRecommendations = async () => {
     try {
-      // Erhöhe die Anzahl der Empfehlungen
+      console.log('🔄 Lade beliebte Empfehlungen...');
       const response = await fetch('http://localhost:5157/api/recommendations/popular?count=8');
-      const respose =  await MoviesService.getApiMovies()
+      console.log('📡 Response Status:', response.status, response.statusText);
+
       if (response.ok) {
         const data = await response.json();
         console.log('🌟 Empfehlungen Antwort:', data);
-        
+        console.log('🌟 Typ:', Array.isArray(data) ? 'Array' : typeof data);
+        console.log('🌟 Anzahl:', Array.isArray(data) ? data.length : 'Kein Array');
+
         // Check ob data ein Array ist oder ein Objekt mit recommendations
         if (Array.isArray(data)) {
+          console.log('✅ Setze Empfehlungen (Array):', data.length);
           setRecommendations(data);
         } else if (data.recommendations && Array.isArray(data.recommendations)) {
+          console.log('✅ Setze Empfehlungen (Object.recommendations):', data.recommendations.length);
           setRecommendations(data.recommendations);
         } else {
-          console.log('Unerwartetes Datenformat:', data);
+          console.log('❌ Unerwartetes Datenformat:', data);
         }
+      } else {
+        console.log('❌ Response nicht OK:', response.status, response.statusText);
       }
     } catch (error) {
-      console.log('Keine Empfehlungen verfügbar:', error);
+      console.error('❌ Fehler beim Laden der Empfehlungen:', error);
     }
   };
 
