@@ -1,0 +1,83 @@
+Docker starten: docker-compose up -d
+
+
+cd Movies
+dotnet clean
+dotnet build
+dotnet run
+
+docker exec -it postgres_movies_container psql -U default_user -d postgres_movie_db
+
+\d "Genres"
+
+
+
+netstat -ano | findstr :5157
+
+taskkill /PID 29156 /F
+
+
+
+
+http://localhost:5157/index.html
+
+
+Migration erstellen: dotnet ef migrations add InitDatabase
+
+
+Migration auf PostgreSQL ausführen: dotnet ef database update
+
+
+
+
+
+1. PostgreSQL
+
+
+docker-compose up -d
+
+docker ps
+
+docker exec -it postgres_movies_container psql -U default_user -d postgres_movie_db
+
+
+SELECT version(); -- PostgreSQL-Version prüfen
+
+
+
+
+2. Tabellen erstellen: 
+
+
+Create …..
+
+
+
+
+3. Mit Migration:
+
+
+Migration erstellen:
+
+   dotnet ef migrations add InitDatabase
+
+
+Migration auf PostgreSQL ausführen:
+
+   dotnet ef database update
+
+
+
+
+
+4. Verbindung zwischen PostgreSQL und Backend
+
+A. PostgreSQL-Integration in ASP.NET Core
+
+Installiere den PostgreSQL-Treiber:
+
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+
+
+
+
